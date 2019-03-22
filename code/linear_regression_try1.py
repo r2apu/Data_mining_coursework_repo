@@ -6,7 +6,8 @@ import numpy as np
 
 
 def get_data():
-    return pd.read_csv('../data/train.csv')
+    return pd.read_csv(
+        '../data/export_train.csv'), pd.read_csv('../data/export_test.csv')
 
 
 def get_train_test():
@@ -65,9 +66,11 @@ def print_predictions(predictions, target):
 def main():
     print('wEllo Horld')
 
-    train_df, test_df = get_train_test()
+    train_df, test_df = get_data()
 
-    y = train_df[['trip_duration']]
+    y = train_df['trip_duration']
+    # ylog = np.log(y.values+1)
+
     my_train_data_1, my_test_data_1 = get_some_columns(train_df, test_df)
     my_train_data_2, my_test_data_2 = get_some_columns(train_df, test_df, [
         'pickup_longitude', 'dropoff_longitude', 'pickup_latitude',
@@ -80,31 +83,76 @@ def main():
             'pickup_longitude', 'dropoff_longitude', 'pickup_latitude',
             'dropoff_latitude', 'vendor_id', 'passenger_count',
             'pickup_datetime', 'dropoff_datetime'])
-    # print('Train set 3:{}'.format(my_train_data_3.head()))
-    # print('Test set 3:{}'.format(my_test_data_3.head()))
 
-    train_df_dt2 = convert_datetime(train_df, datetime_func2)
-    test_df_dt2 = convert_datetime(test_df, datetime_func2)
     my_train_data_4, my_test_data_4 = \
-        get_some_columns(train_df_dt2, test_df_dt2, [
+        get_some_columns(train_df_dt1, test_df_dt1, [
             'pickup_longitude', 'dropoff_longitude', 'pickup_latitude',
             'dropoff_latitude', 'vendor_id', 'passenger_count',
-            'pickup_datetime', 'dropoff_datetime'])
+            'pickup_datetime', 'dropoff_datetime', 'humidity_pickup',
+            'pressure_pickup', 'wind_direction_pickup',
+            'wind_speed_pickup', 'temperature_pickup'
+        ])
 
-    # print('Train set 4:{}'.format(my_train_data_4.head()))
-    # print('Test set 4:{}'.format(my_test_data_4.head()))
+    my_train_data_4, my_test_data_4 = \
+        get_some_columns(train_df_dt1, test_df_dt1, [
+            'pickup_longitude', 'dropoff_longitude', 'pickup_latitude',
+            'dropoff_latitude', 'vendor_id', 'passenger_count',
+            'pickup_datetime', 'dropoff_datetime', 'humidity_pickup',
+            'pressure_pickup', 'wind_direction_pickup',
+            'wind_speed_pickup', 'temperature_pickup'
+        ])
+
+    my_train_data_5, my_test_data_5 = \
+        get_some_columns(train_df_dt1, test_df_dt1, [
+            'pickup_longitude', 'dropoff_longitude', 'pickup_latitude',
+            'dropoff_latitude', 'vendor_id', 'passenger_count',
+            'pickup_datetime', 'dropoff_datetime', 'humidity_pickup',
+            'pressure_pickup', 'wind_direction_pickup',
+            'wind_speed_pickup', 'temperature_pickup',
+            'hour_pickup', 'minute_pickup',
+            'hour_dropoff', 'minute_dropoff'
+        ])
+
+    my_train_data_6, my_test_data_6 = \
+        get_some_columns(train_df_dt1, test_df_dt1, [
+            'pickup_longitude', 'dropoff_longitude', 'pickup_latitude',
+            'dropoff_latitude', 'vendor_id', 'passenger_count',
+            'pickup_datetime', 'dropoff_datetime', 'humidity_pickup',
+            'pressure_pickup', 'wind_direction_pickup',
+            'wind_speed_pickup', 'temperature_pickup',
+            'hour_pickup', 'minute_pickup',
+            'hour_dropoff', 'minute_dropoff',
+            'weekday_pickup', 'is_weekend_pickup'
+        ])
 
     prediction1 = do_linear_regression(my_train_data_1, my_test_data_1, y)
     prediction2 = do_linear_regression(my_train_data_2, my_test_data_2, y)
     prediction3 = do_linear_regression(my_train_data_3, my_test_data_3, y)
     prediction4 = do_linear_regression(my_train_data_4, my_test_data_4, y)
+    prediction5 = do_linear_regression(my_train_data_5, my_test_data_5, y)
+    prediction6 = do_linear_regression(my_train_data_6, my_test_data_6, y)
 
-    print(mean_squared_error(prediction1, test_df['trip_duration']))
-    print(mean_squared_error(prediction2, test_df['trip_duration']))
-    print(mean_squared_error(prediction3, test_df['trip_duration']))
-    print(mean_squared_error(prediction4, test_df['trip_duration']))
+    print('Just pick up and dropoff locations: {}'.format(
+        mean_squared_error(prediction1, test_df['trip_duration'])))
+    print(
+        'Pick up, dropff locations, vendor_id, and passenger_count: {}'.format(
+            mean_squared_error(prediction2, test_df['trip_duration'])))
+    print(
+        'Pick up, dropoff location AND time -converted to seconds since 1970-,'
+        'vendor_id, passenger_count: {}'.format(
+            mean_squared_error(prediction3, test_df['trip_duration'])))
 
-    # print_predictions(prediction3, test_df['trip_duration'])
+    print('Adding weather: {}'.format(
+        mean_squared_error(
+            prediction4, test_df['trip_duration'])))
+
+    print('Adding hour and minute pickup-dropoff: {}'.format(
+        mean_squared_error(
+            prediction5, test_df['trip_duration'])))
+
+    print('plus weekend pickup and is_weekend_pickup: {}'.format(
+        mean_squared_error(
+            prediction6, test_df['trip_duration'])))
 
 
 if __name__ == '__main__':
